@@ -44,10 +44,3 @@ class Nota(Base):
     notas = Column(Float)
     #aluno = relationship("Aluno", back_populates="notas")
     turmas = relationship("Turma", back_populates="notas")
-
-# Apenas a definição da tabela Professor está presente aqui.
-# Precisamos adicionar apenas os códigos relacionados à tabela Professor
-# e, em seguida, tentar popular essa tabela novamente.
-
-# Códigos para outras tabelas como Disciplina, Turma, Aluno, Nota e Frequencia
-# devem ser excluídos temporariamente para evitar confusões.
