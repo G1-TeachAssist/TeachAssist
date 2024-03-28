@@ -1,0 +1,10 @@
+distlib==0.3.8
+Faker==24.4.0
+filelock==3.13.3
+greenlet==3.0.3
+platformdirs==4.2.0
+python-dateutil==2.9.0.post0
+six==1.16.0
+SQLAlchemy==2.0.29
+typing-extensions==4.10.0
+virtualenv==20.25.1
