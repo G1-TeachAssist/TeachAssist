@@ -14,17 +14,22 @@ Bem-vindo ao repositório do projeto de Engenharia de Software "TeachAssist". Es
 - **Proposta de Projeto**: Proposta inicial do projeto.
 - **README.md**: Este arquivo que você está lendo agora, fornecendo uma visão geral do conteúdo do repositório.
 
-**Código e Notebooks:**
-- **01_criando_tabelas.ipynb**: Criação das tabelas necessárias.
-- **02_base_analitica.ipynb**: Criação da base única e consolidada de todas as tabelas.
-- **03_analises_graficas_pre_acao.ipynb**: Análises gráficas pré-ação do professor.
-- **04_analises_graficas_pos_acao.ipynb**: Análises gráficas pós-ação do professor.
-- **models.py**: Modelos utilizados para criar as tabelas.
-- **__pycache__/**: Pasta de cache de arquivos Python.
-- **requirements.txt**: Dependências do projeto.
+**Código e Notebooks:**  
+- **code/analysis/**: Esta pasta contém o código e notebooks relacionados à análises inicias.
+  - **01_criando_tabelas.ipynb**: Criação das tabelas necessárias.
+  - **02_base_analitica.ipynb**: Criação da base única e consolidada de todas as tabelas.
+  - **03_analises_graficas_pre_acao.ipynb**: Análises gráficas pré-ação do professor.
+  - **04_analises_graficas_pos_acao.ipynb**: Análises gráficas pós-ação do professor.
+  - **models.py**: Modelos utilizados para criar as tabelas.
+  - **__pycache__/**: Pasta de cache de arquivos Python.
+  - **requirements.txt**: Dependências do projeto.
 
-**Dados:**
-- **desempenho_academico.db**: Exemplo de banco de dados contendo tabelas.
-- **dados_academicos.xlsx**: Planilha Excel com dados gerados randomicamente para base analítica.
+**Dados:**  
+- **data/analysis/**: Esta pasta contém os dados relacionados à análises inicias.
+  - **desempenho_academico.db**: Exemplo de banco de dados contendo tabelas.
+  - **dados_academicos.xlsx**: Planilha Excel com dados gerados randomicamente para base analítica.
+
+**Nota Importante:**  
+Os arquivos dentro das pastas `code/analysis` e `data/analysis` são apenas para testes e possuem dados fictícios. Eles não refletem dados reais, mas são usados para fins de desenvolvimento e teste.
 
 Sinta-se à vontade para explorar os arquivos e contribuir com o desenvolvimento do projeto!
