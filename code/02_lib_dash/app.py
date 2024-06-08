@@ -51,10 +51,10 @@ app.layout = html.Div([
     
     # Título
     html.Div([
-        html.H1("Tech Assist", className="header-title"),
-        html.P("Análise de notas escolares para apoiar os professores na verificação de assuntos/disciplinas que precisam ser melhor trabalhados com seus alunos",
-               className="header-description")
-    ], className="header"),
+        html.H1("Dashboard", className="header-title"),
+        # html.P("Análise de notas escolares para apoiar os professores na verificação de assuntos/disciplinas que precisam ser melhor trabalhados com seus alunos",
+        #        className="header-description")
+    ], className="header", style={"height": "150px", "background-color": "#2f3640", "border-radius": "10px"}),
 
     # Filtros
     html.Div([
