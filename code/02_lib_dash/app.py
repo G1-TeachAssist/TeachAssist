@@ -60,22 +60,21 @@ app.layout = html.Div([
     html.Div([
         # Dropdown Disciplina
         html.Div([
-            html.Div(children="Disciplina", className="menu-title"),
-            html.Div(
-            dcc.Dropdown(
-                id="dropdown-disciplina",
-                options=[
-                    {"label": f"Disciplina {disciplina_id}", "value": disciplina_id}
-                    for disciplina_id in disciplina_df["id"].unique()
-                    ],
-                    value=list(disciplina_df["id"].unique()), # valor padrão quando a página é carregada
-                    className="dropdown",
-                    multi=True
-                    ),
-                    ),
-                #html.Div(id='selected-disciplinas')
-                ]
-            ),
+        html.Div(children="Disciplina", className="menu-title"),
+        dcc.Dropdown(
+            id="dropdown-disciplina",
+            options=[
+                {"label": f"Disciplina {disciplina_id}", "value": disciplina_id}
+                for disciplina_id in disciplina_df["id"].unique()
+            ],
+            value=list(disciplina_df["id"].unique()),  # valor padrão quando a página é carregada
+            className="dropdown",
+            multi=True,
+            searchable=True,
+            placeholder="Selecione uma disciplina..."
+        ),
+    ], style={'width': '50%', 'display': 'inline-block', 'margin-right': '5%'}),
+    
         # Calendario
         html.Div([
             html.Div(children="Periodo", className="menu-title"),
@@ -142,7 +141,7 @@ def update_kpis(selected_disciplina_ids, start_date, end_date):
                 html.H3(f'{num_alunos_total:}')  
             ], className='card'),
             html.Div([
-                html.H2('Média dde Notas'),
+                html.H2('Média de Notas'),
                 html.H3(f'{media_total:.2f}')  
             ], className='card'),
             html.Div([
