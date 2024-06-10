@@ -54,27 +54,8 @@ body {
     box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.18);
 }
 
-.Select-control {
-    width: 256px;
-    height: 48px;
-}
-
-.Select--single>.Select-control .Select-value,
-.Select-placeholder {
-    line-height: 48px;
-}
-
-.Select--multi .Select-value-label {
-    line-height: 32px;
-}
-
 .menu-title {
     margin-bottom: 6px;
     font-weight: bold;
     color: #079A82;
-}
-
-.dropdown {
-    max-height: 48px; /* Altura máxima do dropdown */
-    overflow-y: auto; /* Adiciona barra de rolagem vertical quando necessário */
 }
