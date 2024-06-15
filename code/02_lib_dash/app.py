@@ -1,10 +1,12 @@
 from faker import Faker
 import pandas as pd
+import numpy as np
 import random
 import dash
 import datetime
 import re
 import plotly.graph_objs as go
+import plotly.express as px
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output
 
@@ -54,7 +56,7 @@ app.layout = html.Div([
         html.H1("Dashboard", className="header-title"),
         # html.P("Análise de notas escolares para apoiar os professores na verificação de assuntos/disciplinas que precisam ser melhor trabalhados com seus alunos",
         #        className="header-description")
-    ], className="header", style={"height": "150px", "background-color": "#2f3640", "border-radius": "10px", "margin-top":"10px"}),
+    ], className="header", style={"height": "150px", "background-color": "#2f3640", "border-radius": "10px" , "margin-top" : "10px" } ),
 
     # Filtros
     html.Div([
@@ -184,6 +186,7 @@ def update_kpis(selected_disciplina_ids, start_date, end_date):
     ]
 
 # Callback para atualizar o gráfico com os dados da média das notas por turma
+# Callback para atualizar o gráfico com os dados da média das notas por turma
 @app.callback(
     Output('media-nota-chart', 'figure'),
     [Input('dropdown-disciplina', 'value'),
@@ -198,8 +201,12 @@ def update_graph(selected_disciplina_ids, start_date, end_date):
     disciplinas_selecionadas = turma_df[turma_df['disciplina_id'].isin(selected_disciplina_ids)]
     disciplinas_selecionadas = disciplinas_selecionadas[(disciplinas_selecionadas['started_at'] >= start_date) & (disciplinas_selecionadas['started_at'] <= end_date)]
     notas_disciplinas_selecionadas = media_final_df[media_final_df['disciplina_id'].isin(disciplinas_selecionadas['disciplina_id'])]
-    media_notas_disciplinas_filtrado = notas_disciplinas_selecionadas.groupby(['disciplina_id']).agg(media_final=('nota_final', 'mean')).reset_index()
-
+    notas_disciplinas_selecionadas = notas_disciplinas_selecionadas.merge(disciplina_df, left_on=['disciplina_id'], right_on=['id'])
+    media_notas_disciplinas_filtrado = notas_disciplinas_selecionadas.groupby(['disciplina_id','nome']).agg(media_final=('nota_final', 'mean')).reset_index()
+    
+    # Definir cores para as barras
+    colors = ['#046157', '#079A82', '#04CCB6', '#4A4A4A', '#F4A261']
+    
     # Criar o gráfico de barras
     data = []
     tickvals = []
@@ -208,26 +215,36 @@ def update_graph(selected_disciplina_ids, start_date, end_date):
         trace = go.Bar(
             x=[i],  # Usar um índice como valor no eixo X
             y=[media['media_final']],  # Média das notas
-            name=f'Turma {media["disciplina_id"]}'
+            name=media["nome"],
+            marker_color=colors[i % len(colors)],  # Definir a cor das barras
+            text=[f'Média: {media["media_final"]:.2f}'],  # Texto do tick
+            #textposition='outside'  # Posição do texto
         )
         data.append(trace)
         tickvals.append(i)  # Adicionar o índice como valor de tick
-        ticktext.append(f'Turma {media["disciplina_id"]}')  # Adicionar o nome da turma como rótulo do tick
+        ticktext.append(media["nome"])  # Adicionar o nome da disciplina como rótulo do tick
     
     layout = go.Layout(
-        title='Média das Notas por Disciplina',
+        title=dict(
+            text='Média das Notas por Disciplina',
+            x=0.5  # Centralize the title
+        ),
         xaxis=dict(
-            title='Disciplina ID',
+            title='Disciplina',
             tickvals=tickvals,  # Valores dos ticks no eixo X
             ticktext=ticktext  # Rótulos dos ticks no eixo X
         ),
-        yaxis=dict(title='Média das Notas')
+        yaxis=dict(title='Média das Notas'),
+        plot_bgcolor='rgba(0,0,0,0)',  # Remover o fundo
+        paper_bgcolor='rgba(0,0,0,0)',  # Remover o fundo do papel
+        showlegend=False  # Remover a legenda
     )
     
     fig = go.Figure(data=data, layout=layout)
 
     return fig
 
+# Callback para atualizar o gráfico com os dados da média das notas por avaliação
 # Callback para atualizar o gráfico com os dados da média das notas por turma
 @app.callback(
     Output('media-aval-chart', 'figure'),
@@ -243,28 +260,39 @@ def update_graph(selected_disciplina_ids, start_date, end_date):
     disciplinas_selecionadas = turma_df[turma_df['disciplina_id'].isin(selected_disciplina_ids)]
     disciplinas_selecionadas = disciplinas_selecionadas[(disciplinas_selecionadas['started_at'] >= start_date) & (disciplinas_selecionadas['started_at'] <= end_date)]
     notas_disciplinas_selecionadas = notas_df.merge(disciplinas_selecionadas, left_on=['turma_id','aluno_id'], right_on=['id','aluno_id'])
-    media_aval = notas_disciplinas_selecionadas.groupby(['disciplina_id','aval']).agg(media_final=('nota', 'mean')).reset_index()
+    notas_disciplinas_selecionadas = notas_disciplinas_selecionadas.merge(disciplina_df, left_on=['disciplina_id'], right_on=['id'])
+    media_aval = notas_disciplinas_selecionadas.groupby(['disciplina_id','nome','aval']).agg(media_final=('nota', 'mean')).reset_index()
 
+    # Definir cores para as barras
+    colors = ['#046157', '#079A82', '#04CCB6', '#4A4A4A', '#F4A261']
+    
     # Criar o gráfico de barras
     data = []
-    for aval, grupo in media_aval.groupby('aval'):
+    for i, (aval, grupo) in enumerate(media_aval.groupby('aval')):
         trace = go.Bar(
-            x=grupo['disciplina_id'],
+            x=grupo['nome'],
             y=grupo['media_final'],
-            name=f'Avaliação {aval}'
+            name=f'Avaliação {aval}',
+            marker=dict(color=colors[i % len(colors)])  # Assign colors cyclically
         )
         data.append(trace)
     
     layout = go.Layout(
-        title='Média das Notas por Disciplina e Avaliação',
-        xaxis=dict(title='Disciplina ID'),
-        yaxis=dict(title='Média das Notas')
+        title=dict(
+            text='Média das Notas por Disciplina e Avaliação',
+            x=0.5  # Centralize the title
+        ),
+        xaxis=dict(title='Disciplina'),
+        yaxis=dict(title='Média das Notas'),
+        plot_bgcolor='rgba(0,0,0,0)',  # Remover o fundo
+        paper_bgcolor='rgba(0,0,0,0)',  # Remover o fundo do papel
     )
     
     fig = go.Figure(data=data, layout=layout)
 
     return fig
 
+# Callback para atualizar o gráfico de setor com os dados de aprovação por disciplina
 # Callback para atualizar o gráfico com os dados de aprovação por disciplina
 @app.callback(
     Output('aprovacao-disciplina-chart', 'figure'),
@@ -297,13 +325,19 @@ def update_aprovacao_disciplina(selected_disciplina_ids, start_date, end_date):
     # Criar o gráfico de rosca
     labels = ['Aprovados', 'Reprovados', 'Sem Nota']
     values = [percent_aprovados, percent_reprovados, percent_sem_nota]
+    colors = ['#079A82', '#F4A261', '#4A4A4A']  # Cores personalizadas
 
-    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.3)])
-
-    fig.update_layout(
-        title='Percentual de Alunos Aprovados, Reprovados e Sem Nota',
-        #annotations=[dict(text=f'Disciplinas Selecionadas: {", ".join(map(str, selected_disciplina_ids))}', showarrow=False)]
+    layout = go.Layout(
+        title=dict(
+            text='Percentual de Alunos Aprovados, Reprovados e Sem Nota',
+            x=0.5  # Centralize the title
+        ),
+        plot_bgcolor='rgba(0,0,0,0)',  # Remover o fundo
+        paper_bgcolor='rgba(0,0,0,0)',  # Remover o fundo do papel
     )
+
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.3, marker=dict(colors=colors))],
+                    layout=layout)
 
     return fig
 
@@ -329,10 +363,34 @@ def update_histograma_notas(selected_disciplina_ids, start_date, end_date):
     # Criar o histograma de notas
     fig = go.Figure(data=[go.Histogram(x=notas_disciplinas_selecionadas['nota'])])
 
+    # Gerar o histograma
+    BINS = 10
+    y, x = np.histogram(notas_disciplinas_selecionadas['nota'], bins=BINS)
+    x = [(a + b) / 2 for a, b in zip(x, x[1:])]
+
+   # Definir a escala de cores personalizada
+    color_scale = [[0, '#F4A261'], [1, '#079A82']]
+
+    fig = px.bar(x=x, 
+                 y=y, 
+                 color=x,
+                 labels={'y': 'Frequência'},  # Define o rótulo para o eixo y
+                 color_continuous_scale=color_scale)
+    fig.update_traces(marker_line_color="black", hovertemplate='Frequência: %{y}<extra></extra>')
+
     fig.update_layout(
-        title='Histograma de Notas',
+        title=dict(
+            text='Distribuição das notas dos alunos',
+            x=0.5  # Centralize the title
+        ),
         xaxis_title='Nota',
-        yaxis_title='Frequência'
+        yaxis_title='Frequência',
+        plot_bgcolor='rgba(0,0,0,0)',  # Remover o fundo
+        paper_bgcolor='rgba(0,0,0,0)',  # Remover o fundo do papel
+        coloraxis_colorbar=dict(
+            title="Cores"
+        )
+        
     )
 
     return fig
